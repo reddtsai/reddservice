@@ -1,0 +1,63 @@
+name: Bug Report
+description: 回報一個問題或錯誤
+title: "[Bug]："
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        謝謝您的回報！請提供以下訊息來幫助我們理解和解決這個問題。
+
+  - type: input
+    id: environment
+    attributes:
+      label: 環境
+      description: 請輸入遇到此問題發生的環境和設備。
+      placeholder: 例如：測試環境 iPhone 12；客戶安卓手機
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本號
+      description: 請輸入應用程序的版本號。
+      placeholder: 版本號
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: 問題描述
+      description: 請詳細描述你遇到的問題。
+      placeholder: 請輸入問題描述
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: 重現步驟
+      description: 請列出重現此問題的步驟（如有可能）。
+      placeholder: 例如：1. 打開應用程式 2. 點擊 "登錄" 按鈕 3. 發生錯誤
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: 預期行為
+      description: 請描述你預期應該發生的行為。
+      placeholder: 請輸入預期行為
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 嚴重程度
+      description: 請選擇錯誤的嚴重程度。
+      options:
+        - 阻塞 (應用無法運行)
+        - 嚴重 (核心功能損壞)
+        - 中等 (影響某些功能)
+        - 輕微 (小問題)
+    validations:
+      required: true

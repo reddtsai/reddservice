@@ -1,0 +1,62 @@
+name: Feature Request
+description: 提交功能請求
+title: "[Feature]："
+labels: "enhancement"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感謝您的貢獻！請按照以下格式填寫您的功能請求。
+
+  - type: dropdown
+    id: feature_type
+    attributes:
+      label: 功能類型
+      description: 請選擇功能請求的類型。
+      options:
+        - 新功能
+        - 更新功能
+        - 優化功能
+        - 文件
+        - 測試
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: 功能描述
+      description: 請具體說明您想要的功能以及它將解決的問題。
+      placeholder: 請輸入詳細的描述
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: alternatives_considered
+    attributes:
+      label: 替代方案
+      description: 您是否考慮過其他替代方案？
+      options:
+        - label: 已考慮
+        - label: 尚未考慮
+
+  - type: textarea
+    id: alternatives_considered_description
+    attributes:
+      label: 替代方案描述
+      description: 如果有考慮替代方案，請具體說明。
+      placeholder: 請輸入詳細的描述
+
+  - type: dropdown
+    id: scope_of_impact
+    attributes:
+      label: 預期影響範圍
+      description: 請選擇此功能影響範圍。
+      options:
+        - 新功能/模組
+        - 小範圍修改
+        - 模組範圍變更
+        - 全系統影響
+    validations:
+      required: true
