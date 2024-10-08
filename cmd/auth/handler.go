@@ -12,10 +12,14 @@ import (
 
 type grpcHandler struct {
 	pb.UnimplementedAuthServiceServer
+
+	ctx context.Context
 }
 
-func NewGrpcHandler(grpcServer *grpc.Server) {
-	pb.RegisterAuthServiceServer(grpcServer, &grpcHandler{})
+func NewGrpcHandler(ctx context.Context, grpcServer *grpc.Server) {
+	pb.RegisterAuthServiceServer(grpcServer, &grpcHandler{
+		ctx: ctx,
+	})
 }
 
 func (h *grpcHandler) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
