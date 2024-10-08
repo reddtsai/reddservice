@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "github.com/reddtsai/reddservice/common/api/proto"
+	pb "github.com/reddtsai/reddservice/api/proto"
 )
 
 type grpcHandler struct {

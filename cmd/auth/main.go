@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/reddtsai/reddservice/common/logger"
+	"github.com/reddtsai/reddservice/pkg/logger"
 )
 
 var addr = 50051
