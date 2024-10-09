@@ -9,3 +9,11 @@ go-mod-tidy:
 		go mod tidy; \
 		cd ..; \
 	done
+
+.PHONY: run-auth
+run-auth:
+	go run ./cmd/auth/ --grpc-port=50051 --http-port=8080
+
+.PHONY: build-auth
+build-auth:
+	go build -gcflags="-m" -o bin/auth ./cmd/auth/

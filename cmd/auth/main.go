@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -15,6 +14,7 @@ import (
 
 	grpczap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpcprom "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"github.com/reddtsai/reddservice/internal/global"
@@ -31,7 +31,6 @@ var (
 func init() {
 	flag.IntVar(&grpcPort, "grpc-port", 50051, "auth server port")
 	flag.IntVar(&httpPort, "http-port", 8081, "metrics server port")
-
 }
 
 func main() {
@@ -66,7 +65,10 @@ func shutdown() {
 	global.Logger.Info("shutting down auth server")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	httpSrv.Shutdown(ctx)
+	err := httpSrv.Shutdown(ctx)
+	if err != nil {
+		global.Logger.Error("metrics server shutdown failed", zap.Error(err))
+	}
 	grpcSrv.GracefulStop()
 }
 
@@ -74,19 +76,19 @@ func grpcListen() {
 	defer wg.Done()
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		log.Fatalln("grpc failed to listen", err)
+		global.Logger.Fatal("grpc failed to listen", zap.Error(err))
 	}
 	defer listen.Close()
 	err = grpcSrv.Serve(listen)
 	if err != nil {
-		log.Fatalln("grpc failed to serve", err)
+		global.Logger.Fatal("grpc failed to serve", zap.Error(err))
 	}
 }
 
 func httpListen() {
 	defer wg.Done()
 	err := httpSrv.ListenAndServe()
-	if err != nil {
-		log.Fatalln("metrics failed to serve", err)
+	if err != nil && err != http.ErrServerClosed {
+		global.Logger.Fatal("metrics failed to serve", zap.Error(err))
 	}
 }

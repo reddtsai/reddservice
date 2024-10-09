@@ -12,17 +12,14 @@ import (
 
 type grpcHandler struct {
 	pb.UnimplementedAuthServiceServer
-
-	ctx context.Context
 }
 
 func NewGrpcHandler(ctx context.Context, grpcServer *grpc.Server) {
-	pb.RegisterAuthServiceServer(grpcServer, &grpcHandler{
-		ctx: ctx,
-	})
+	pb.RegisterAuthServiceServer(grpcServer, &grpcHandler{})
 }
 
 func (h *grpcHandler) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
 	// TODO: implement SignUp
-	return nil, status.Error(codes.Unimplemented, "not implemented")
+	err := status.Error(codes.Unimplemented, "not implemented")
+	return nil, err
 }
