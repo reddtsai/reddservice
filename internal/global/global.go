@@ -6,7 +6,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -17,26 +16,22 @@ const (
 )
 
 var (
-	once        sync.Once
+	loggerOnce  sync.Once
 	Logger      *zap.Logger
 	SugarLogger *zap.SugaredLogger
+	configOnce  sync.Once
+	Config      *Configuration
 )
 
 func init() {
-	// TODO: add configuration
-	viper.AutomaticEnv()
-	viper.SetDefault(KEY_LOG_LEVEL, -1) // -1 ~ 5
-	newZapLogger()
+	initConfiguration()
+	initZapLogger()
 }
 
-func newZapLogger() {
-	level := -1
-	if isSet := viper.IsSet(KEY_LOG_LEVEL); isSet {
-		level = viper.GetInt(KEY_LOG_LEVEL)
-	}
-	once.Do(func() {
+func initZapLogger() {
+	loggerOnce.Do(func() {
 		config := zap.NewProductionConfig()
-		config.Level = zap.NewAtomicLevelAt(zapcore.Level(level))
+		config.Level = zap.NewAtomicLevelAt(zapcore.Level(Config.LogOpts.Level))
 		logger, err := config.Build()
 		if err != nil {
 			panic(err)
