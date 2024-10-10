@@ -3,23 +3,34 @@ package main
 import (
 	"context"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	pb "github.com/reddtsai/reddservice/api/proto"
+	"github.com/reddtsai/reddservice/internal/auth"
 )
 
-type grpcHandler struct {
+type AuthHandler struct {
 	pb.UnimplementedAuthServiceServer
+
+	authSvc auth.IAuthService
 }
 
-func NewGrpcHandler(ctx context.Context, grpcServer *grpc.Server) {
-	pb.RegisterAuthServiceServer(grpcServer, &grpcHandler{})
+func NewAuthHandler(authSvc auth.IAuthService) *AuthHandler {
+	return &AuthHandler{
+		authSvc: authSvc,
+	}
 }
 
-func (h *grpcHandler) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
-	// TODO: implement SignUp
-	err := status.Error(codes.Unimplemented, "not implemented")
-	return nil, err
+func (h *AuthHandler) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
+	_, err := h.authSvc.CreateUser(auth.ServiceInput[auth.CreateUser]{
+		Data: auth.CreateUser{
+			Name:  req.Username,
+			Email: req.Email,
+		},
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &pb.SignUpResponse{}, nil
 }

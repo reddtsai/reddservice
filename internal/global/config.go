@@ -1,19 +1,22 @@
 package global
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 const (
-	CONFIF_FILE = "config/config.yaml"
+	CONFIG_FILE = "config.yaml"
 )
 
 func initConfiguration() {
 	configOnce.Do(func() {
 		viper.AutomaticEnv()
-		viper.SetDefault(KEY_LOG_LEVEL, -1) // -1 ~ 5
+		viper.AddConfigPath(CONFIG_PATH)
+		viper.SetConfigType("yaml")
 
-		viper.SetConfigFile(CONFIF_FILE)
+		viper.SetConfigName(CONFIG_FILE)
 		err := viper.ReadInConfig()
 		if err != nil {
 			panic(err)
@@ -24,4 +27,15 @@ func initConfiguration() {
 			panic(err)
 		}
 	})
+}
+
+func GetPostgresqlConnSetting(name string) PostgresqlConnSetting {
+	opts := Config.SQLOpts[name]
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:5432/%s", opts.Username, opts.Password, opts.Addr, opts.DB)
+	return PostgresqlConnSetting{
+		DSN:         dsn,
+		MaxOpenConn: opts.MaxOpenConn,
+		MaxIdleConn: opts.MaxIdleConn,
+		MaxLifetime: opts.MaxLifetime,
+	}
 }

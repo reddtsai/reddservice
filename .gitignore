@@ -23,3 +23,6 @@
 # Build directories
 bin/
 build/
+
+# persistant data
+data/

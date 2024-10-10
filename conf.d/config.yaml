@@ -1,0 +1,11 @@
+log-options:
+  level: -1 # -1,0,1,2,3,4,5
+sql-options:
+  auth:
+    addr: "localhost:5432"
+    username: "admin"
+    password: "1qaz2wsx"
+    db: "auth"
+    max-lifetime: 1 # 分鐘
+    max-open-conn: 200
+    max-idle-conn: 100

@@ -9,19 +9,23 @@ service AuthService {
 }
 
 message SignInRequest {
-    string username = 1;
-    string password = 2;
+    RequestMeta Meta = 1;
+    string Username = 2;
+    string Password = 3;
 }
 
 message SignInResponse {
-    Response response = 1;
-    string token = 2;
+    ResponseStatus Status = 1;
+    string Token = 2;
 }
 
 message SignUpRequest {
-    string username = 1;
+    RequestMeta Meta = 1;
+    string Username = 2;
+    string Email = 3;
+
 }
 
 message SignUpResponse {
-    Response response = 1;
+    ResponseStatus Status = 1;
 }
