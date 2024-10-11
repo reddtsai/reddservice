@@ -10,7 +10,7 @@ type ServiceInput[T any] struct {
 
 type UserTable struct {
 	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
+	Account   string    `json:"account"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_at"`
@@ -18,6 +18,6 @@ type UserTable struct {
 }
 
 type CreateUser struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Account string `json:"account"`
+	Email   string `json:"email"`
 }

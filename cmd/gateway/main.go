@@ -29,6 +29,8 @@ type GatewaySrv struct {
 
 var (
 	_gatewaySrv *GatewaySrv
+
+	ServiceName = "gateway"
 )
 
 func init() {
@@ -63,12 +65,10 @@ func (srv *GatewaySrv) shutdown() {
 }
 
 func (srv *GatewaySrv) httpServer() {
-	mux := http.NewServeMux()
 	handler := NewGatewayHandler()
-	handler.registerRoutes(mux)
 	srv.httpSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", srv.httpPort),
-		Handler: gatewayMiddleware(mux),
+		Handler: handler.mux,
 	}
 	srv.wg.Add(1)
 	go func() {
@@ -78,12 +78,4 @@ func (srv *GatewaySrv) httpServer() {
 			global.Logger.Fatal("gateway failed to serve", zap.Error(err))
 		}
 	}()
-}
-
-func gatewayMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: implement logging
-		// AllowOrigins
-		next.ServeHTTP(w, r)
-	})
 }

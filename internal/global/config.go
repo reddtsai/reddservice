@@ -31,7 +31,7 @@ func initConfiguration() {
 
 func GetPostgresqlConnSetting(name string) PostgresqlConnSetting {
 	opts := Config.SQLOpts[name]
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:5432/%s", opts.Username, opts.Password, opts.Addr, opts.DB)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s", opts.Username, opts.Password, opts.Addr, opts.DB)
 	return PostgresqlConnSetting{
 		DSN:         dsn,
 		MaxOpenConn: opts.MaxOpenConn,
