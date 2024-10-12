@@ -9,3 +9,6 @@ sql-options:
     max-lifetime: 1 # 分鐘
     max-open-conn: 200
     max-idle-conn: 100
+grpc-client-options:
+  auth:
+    addr: "localhost:50051"

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
 	"github.com/reddtsai/reddservice/internal/global"
 )
@@ -22,9 +23,10 @@ var (
 )
 
 type GatewaySrv struct {
-	wg       sync.WaitGroup
-	httpSrv  *http.Server
-	httpPort int
+	wg         sync.WaitGroup
+	httpSrv    *http.Server
+	httpPort   int
+	authClient *grpc.ClientConn
 }
 
 var (
@@ -46,6 +48,7 @@ func main() {
 	shutdownCh := make(chan os.Signal, 1)
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 	_gatewaySrv.httpServer()
+	_gatewaySrv.connGrpc("auth")
 	global.Logger.Debug("gateway server started")
 
 	<-shutdownCh
@@ -61,14 +64,15 @@ func (srv *GatewaySrv) shutdown() {
 	if err != nil {
 		global.Logger.Error("gateway server shutdown failed", zap.Error(err))
 	}
+	srv.authClient.Close()
 	srv.wg.Wait()
 }
 
 func (srv *GatewaySrv) httpServer() {
-	handler := NewGatewayHandler()
+	g := NewGateway()
 	srv.httpSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", srv.httpPort),
-		Handler: handler.mux,
+		Handler: g.Handler,
 	}
 	srv.wg.Add(1)
 	go func() {
@@ -78,4 +82,13 @@ func (srv *GatewaySrv) httpServer() {
 			global.Logger.Fatal("gateway failed to serve", zap.Error(err))
 		}
 	}()
+}
+
+func (srv *GatewaySrv) connGrpc(name string) {
+	cfg := global.GetGrpcClientOptions(name)
+	conn, err := ConnGrpcClient(cfg.Addr)
+	if err != nil {
+		global.Logger.Fatal("conn grpc client failed", zap.Error(err))
+	}
+	srv.authClient = conn
 }

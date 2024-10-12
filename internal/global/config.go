@@ -39,3 +39,7 @@ func GetPostgresqlConnSetting(name string) PostgresqlConnSetting {
 		MaxLifetime: opts.MaxLifetime,
 	}
 }
+
+func GetGrpcClientOptions(name string) GrpcClientOptions {
+	return Config.GrpcOpts[name]
+}

@@ -1,0 +1,78 @@
+definitions:
+  main.Response:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      result: {}
+    type: object
+  main.SignUpRequest:
+    properties:
+      account:
+        type: string
+      email:
+        type: string
+    required:
+    - account
+    - email
+    type: object
+  main.SignUpResponse:
+    type: object
+host: localhost
+info:
+  contact: {}
+  description: This is a Gateway API.
+  title: Swagger Gateway
+  version: "1.0"
+paths:
+  /v1/signup:
+    post:
+      consumes:
+      - application/json
+      description: 註冊用戶
+      parameters:
+      - description: raw
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/main.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.Response'
+            - properties:
+                result:
+                  $ref: '#/definitions/main.SignUpResponse'
+              type: object
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/main.Response'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/main.Response'
+        "403":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/main.Response'
+        "409":
+          description: conflict
+          schema:
+            $ref: '#/definitions/main.Response'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/main.Response'
+      summary: 註冊
+      tags:
+      - auth
+swagger: "2.0"
+tags:
+- name: auth

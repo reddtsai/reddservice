@@ -1,12 +1,17 @@
 package global
 
 type Configuration struct {
-	LogOpts LogOptions            `mapstructure:"log-options"`
-	SQLOpts map[string]SQLOptions `mapstructure:"sql-options"`
+	LogOpts  LogOptions                   `mapstructure:"log-options"`
+	SQLOpts  map[string]SQLOptions        `mapstructure:"sql-options"`
+	GrpcOpts map[string]GrpcClientOptions `mapstructure:"grpc-client-options"`
 }
 
 type LogOptions struct {
 	Level int `mapstructure:"level"` // -1,0,1,2,3,4,5
+}
+
+type GrpcClientOptions struct {
+	Addr string `mapstructure:"addr"`
 }
 
 type SQLOptions struct {
