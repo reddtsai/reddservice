@@ -1,7 +1,10 @@
 syntax = "proto3";
 option go_package = ".;proto";
 
-message Response {
+message RequestMeta {
+}
+
+message ResponseStatus {
     int32 status = 1;
     string message = 2;
 }
