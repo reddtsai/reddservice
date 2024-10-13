@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-type ServiceInput[T any] struct {
-	Data T
-}
-
 type UserTable struct {
 	ID        int64     `json:"id"`
 	Account   string    `json:"account"`
@@ -17,7 +13,7 @@ type UserTable struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type CreateUser struct {
+type CreateUserInput struct {
 	Account string `json:"account"`
 	Email   string `json:"email"`
 }

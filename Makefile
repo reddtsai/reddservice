@@ -18,9 +18,17 @@ build-auth:
 	@go build -ldflags "-X main.VERSION=0.0.1 -X $(GO_MODULE)/internal/global.CONFIG_PATH=$(CONFIG_PATH)" -o bin/auth ./cmd/auth/
 #	go build -gcflags="-m" -o bin/auth ./cmd/auth/
 
+.PHONY: test-cover
+test-cover:
+	@go test -cover ./...
+
 .PHONY: gen-swagger
 gen-swagger:
 	swag init -g gateway.go -d ./cmd/gateway -t auth -o api/gateway --pd
+
+.PHONY: gen-mock
+gen-mock:
+	go generate ./...
 
 .PHONY: docker-compose-up
 docker-compose-up:
