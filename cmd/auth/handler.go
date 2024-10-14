@@ -23,11 +23,9 @@ func NewAuthHandler(authSvc auth.IAuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(ctx context.Context, req *pb.SignUpRequest) (*pb.SignUpResponse, error) {
-	_, err := h.authSvc.CreateUser(auth.ServiceInput[auth.CreateUser]{
-		Data: auth.CreateUser{
-			Account: req.Account,
-			Email:   req.Email,
-		},
+	_, err := h.authSvc.CreateUser(auth.CreateUserInput{
+		Account: req.Account,
+		Email:   req.Email,
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

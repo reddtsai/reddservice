@@ -6,14 +6,18 @@ import (
 	"github.com/spf13/viper"
 )
 
+// this value is set by ldflags
+// build -ldflags "-X github.com/reddtsai/reddservice/internal/global.CONFIG_PATH=conf.d"
+// var CONFIG_PATH = "conf.d"
+
 const (
 	CONFIG_FILE = "config.yaml"
 )
 
-func initConfiguration() {
+func loadConfiguration(configPath string) {
 	configOnce.Do(func() {
 		viper.AutomaticEnv()
-		viper.AddConfigPath(CONFIG_PATH)
+		viper.AddConfigPath(configPath)
 		viper.SetConfigType("yaml")
 
 		viper.SetConfigName(CONFIG_FILE)

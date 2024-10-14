@@ -41,14 +41,13 @@ func NewGateway() *Gateway {
 	g := &Gateway{
 		Handler: engine,
 	}
-	g.register()
 
 	return g
 }
 
-func (g *Gateway) register() {
+func (g *Gateway) register(h *Handler) {
 	v1 := g.Handler.Group("/v1")
-	v1.POST("/sign-up", signUp)
+	v1.POST("/sign-up", h.SignUp)
 }
 
 func loggerMiddleware() gin.HandlerFunc {
@@ -61,7 +60,7 @@ func loggerMiddleware() gin.HandlerFunc {
 			path = path + "?" + raw
 		}
 		duration := time.Since(start)
-		msg := fmt.Sprintf("[%s] %15s |%3d| %13s | %-7s %s", ServiceName, c.ClientIP(), c.Writer.Status(), duration.String(), c.Request.Method, path)
+		msg := fmt.Sprintf("[%s] %15s |%3d| %13s | %-7s %s", "gateway", c.ClientIP(), c.Writer.Status(), duration.String(), c.Request.Method, path)
 		global.Logger.Info(msg, zap.Int("status", c.Writer.Status()), zap.String("method", c.Request.Method), zap.String("path", path), zap.Duration("duration", duration))
 	}
 }

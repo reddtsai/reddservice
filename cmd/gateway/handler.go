@@ -10,6 +10,16 @@ import (
 	"github.com/reddtsai/reddservice/internal/global"
 )
 
+type Handler struct {
+	grpcClientConn IGrpcClientConn
+}
+
+func NewHandler(conn IGrpcClientConn) *Handler {
+	return &Handler{
+		grpcClientConn: conn,
+	}
+}
+
 // @Summary 註冊
 // @Description 註冊用戶
 // @Tags auth
@@ -23,7 +33,7 @@ import (
 // @Failure 409 {object} Response "conflict"
 // @Failure 500 {object} Response "server error"
 // @Router /v1/signup [post]
-func signUp(c *gin.Context) {
+func (h *Handler) SignUp(c *gin.Context) {
 	req := SignUpRequest{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
@@ -31,12 +41,7 @@ func signUp(c *gin.Context) {
 		return
 	}
 
-	authClient := pb.NewAuthServiceClient(_gatewaySrv.authClient)
-	if err != nil {
-		global.Logger.Error("conn auth client failed", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "conn auth client failed"})
-		return
-	}
+	authClient := h.grpcClientConn.GetAuthClient()
 	_, err = authClient.SignUp(c.Request.Context(), &pb.SignUpRequest{
 		Account: req.Account,
 		Email:   req.Email,

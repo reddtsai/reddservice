@@ -1,3 +1,5 @@
+//go:build !unittest
+
 package main
 
 import (
@@ -28,7 +30,8 @@ import (
 
 // here value is set by ldflags
 var (
-	VERSION = "dev"
+	VERSION     = "dev"
+	CONFIG_PATH = "conf.d"
 )
 
 type AuthSrv struct {
@@ -52,6 +55,7 @@ func init() {
 	_authSrv = new(AuthSrv)
 	flag.IntVar(&_authSrv.grpcPort, "grpc-port", 50051, "auth server port")
 	flag.IntVar(&_authSrv.httpPort, "http-port", 8081, "metrics server port")
+	global.Startup(CONFIG_PATH)
 }
 
 func main() {

@@ -1,4 +1,3 @@
-GO_MODULE=github.com/reddtsai/reddservice
 CONFIG_PATH=conf.d
 
 .PHONY: gen-grpc
@@ -15,12 +14,28 @@ run-gateway:
 
 .PHONY: build-auth
 build-auth:
-	@go build -ldflags "-X main.VERSION=0.0.1 -X $(GO_MODULE)/internal/global.CONFIG_PATH=$(CONFIG_PATH)" -o bin/auth ./cmd/auth/
+	@go build -ldflags "-X main.VERSION=0.0.1 -X main.CONFIG_PATH=$(CONFIG_PATH)" -o bin/auth ./cmd/auth/
 #	go build -gcflags="-m" -o bin/auth ./cmd/auth/
+
+.PHONY: build-gateway
+build-auth:
+	@go build -ldflags "-X main.VERSION=0.0.1 -X main.CONFIG_PATH=$(CONFIG_PATH)" -o bin/gateway ./cmd/gateway/
+
+.PHONY: test
+test:
+	@go test -tags unittest ./...
+
+.PHONY: test-cover
+test-cover:
+	@go test -cover -tags unittest ./...
 
 .PHONY: gen-swagger
 gen-swagger:
 	swag init -g gateway.go -d ./cmd/gateway -t auth -o api/gateway --pd
+
+.PHONY: gen-mock
+gen-mock:
+	go generate ./...
 
 .PHONY: docker-compose-up
 docker-compose-up:

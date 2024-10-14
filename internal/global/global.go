@@ -15,13 +15,8 @@ var (
 	Config      *Configuration
 )
 
-// here value is set by ldflags
-var (
-	CONFIG_PATH = "conf.d"
-)
-
-func init() {
-	initConfiguration()
+func Startup(configPath string) {
+	loadConfiguration(configPath)
 	initZapLogger()
 }
 
