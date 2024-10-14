@@ -12,6 +12,10 @@ run-auth:
 run-gateway:
 	@go run ./cmd/gateway/ --http-port=80
 
+.PHONY: run-swag
+run-swag:
+	@go run ./api
+
 .PHONY: build-auth
 build-auth:
 	@go build -ldflags "-X main.VERSION=0.0.1 -X main.CONFIG_PATH=$(CONFIG_PATH)" -o bin/auth ./cmd/auth/

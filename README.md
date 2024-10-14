@@ -6,4 +6,12 @@
 
 ## Document
 
+[時序圖](https://github.com/reddtsai/reddservice/tree/main/docs)
+
 ## Test
+
+單元測試
+
+```
+make test
+```
