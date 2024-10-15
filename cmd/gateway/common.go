@@ -21,7 +21,9 @@ type GrpcClientConn struct {
 }
 
 func NewClientConn() (*GrpcClientConn, error) {
-	c := &GrpcClientConn{}
+	c := &GrpcClientConn{
+		connMap: make(map[string]grpc.ClientConnInterface),
+	}
 	err := c.clientConn()
 	if err != nil {
 		return nil, err

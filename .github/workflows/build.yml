@@ -10,8 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - name: add env file
-        run: echo ${{ secrets.ENV }}" | base64 --decode  >> env.json
+
+      - name: login to docker hub
+        run: echo ${{ secrets.DOCKER_HUB_PWD }}" | docker login -u "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
+      - name: build auth image
+        run: docker build --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/auth/Dockerfile -t reddservice-auth:${{ github.ref_name }} .
+      - name: push auth image
+        run: docker push reddtsai/reddservice-auth:${{ github.ref_name }}
+      - name: build gateway image
+        run: docker build --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:${{ github.ref_name }} .
+      - name: push gateway image
+        run: docker push reddtsai/reddservice-gateway:${{ github.ref_name }}

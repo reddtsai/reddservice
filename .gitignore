@@ -26,3 +26,4 @@ build/
 
 # persistant data
 */docker/data/
+*/docker/conf.d
