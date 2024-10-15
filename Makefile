@@ -41,7 +41,16 @@ gen-swagger:
 gen-mock:
 	go generate ./...
 
+.PHONY: build-docker-image
+build-docker-image:
+	docker build --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
+#	docker tag reddservice-auth:dev reddtsai/reddservice-auth:dev
+	docker push reddtsai/reddservice-auth:dev
+	docker build --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
+#	docker tag reddservice-gateway:dev reddtsai/reddservice-gateway:dev
+	docker push reddtsai/reddservice-gateway:dev
+
 .PHONY: docker-compose-up
-docker-compose-up:
+docker-compose-up: build-docker-image
 	rm -rf deployments/docker/data/postgres
 	docker-compose -p reddservice -f deployments/docker/docker-compose.yml up -d
