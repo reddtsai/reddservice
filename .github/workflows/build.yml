@@ -17,10 +17,10 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PWD }}
       - name: build auth image
-        run: docker build --platform linux/arm64 --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/auth/Dockerfile -t reddtsai/reddservice-auth:${{ github.ref_name }} .
+        run: docker build --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/auth/Dockerfile -t reddtsai/reddservice-auth:${{ github.ref_name }} .
       - name: push auth image
         run: docker push reddtsai/reddservice-auth:${{ github.ref_name }}
       - name: build gateway image
-        run: docker build --platform linux/arm64 --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/gateway/Dockerfile -t reddtsai/reddservice-gateway:${{ github.ref_name }} .
+        run: docker build --build-arg APP_VERSION=${{ github.ref_name }} --build-arg CONFIG_PATH=conf.d -f deployments/docker/gateway/Dockerfile -t reddtsai/reddservice-gateway:${{ github.ref_name }} .
       - name: push gateway image
         run: docker push reddtsai/reddservice-gateway:${{ github.ref_name }}
