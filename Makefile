@@ -43,10 +43,10 @@ gen-mock:
 
 .PHONY: build-docker-image
 build-docker-image:
-	docker build --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
+	docker build --platform linux/arm64 --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
 #	docker tag reddservice-auth:dev reddtsai/reddservice-auth:dev
 	docker push reddtsai/reddservice-auth:dev
-	docker build --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
+	docker build --platform linux/arm64 --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
 #	docker tag reddservice-gateway:dev reddtsai/reddservice-gateway:dev
 	docker push reddtsai/reddservice-gateway:dev
 
