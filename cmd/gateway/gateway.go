@@ -53,7 +53,10 @@ func (g *Gateway) register(h *Handler) {
 func loggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
+		// TODO: prometheus
+
 		c.Next()
+
 		path := c.Request.URL.Path
 		raw := c.Request.URL.RawQuery
 		if raw != "" {

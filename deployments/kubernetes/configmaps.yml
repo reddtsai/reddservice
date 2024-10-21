@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-configmap
+  namespace: reddservice
+data:
+  config.yml: |
+    log-options:
+      level: 0
+    grpc-client-options:
+      auth:
+        addr: "auth-service"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-configmap
+  namespace: reddservice
+data:
+  config.yml: |
+    log-options:
+      level: 0
+    sql-options:
+      auth:
+        addr: "192.168.1.110:5432"
+        username: "admin"
+        password: "1qaz2wsx"
+        db: "auth"
+        max-lifetime: 1 # 分鐘
+        max-open-conn: 200
+        max-idle-conn: 100

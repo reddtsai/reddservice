@@ -1,5 +1,14 @@
 version: '3.8'
 
+x-postgres-common:
+  &postgres-common
+  image: postgres:latest
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready", "-U", "admin", "-d", "auth"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
 services:
   gateway:
     container_name: gateway
@@ -30,8 +39,8 @@ services:
         condition: service_healthy
 
   auth-db-master:
+    <<: *postgres-common
     container_name: auth-db-master
-    image: postgres:latest
     environment:
       POSTGRES_DB: auth
       POSTGRES_USER: admin
@@ -41,27 +50,20 @@ services:
       - ./initdb:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   auth-db-slave:
+    <<: *postgres-common
     container_name: auth-db-slave
-    image: postgres:latest
     environment:
       POSTGRES_DB: auth
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: 1qaz2wsx
-      POSTGRES_MASTER_SERVICE_HOST: master
     volumes:
       - ./data/postgres/slave:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     depends_on:
       auth-db-master:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+
