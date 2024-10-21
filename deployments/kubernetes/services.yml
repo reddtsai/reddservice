@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: reddservice
+  name: gateway-service
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: gateway
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: reddservice
+  name: auth-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: grpc
+      protocol: TCP
+      port: 50051
+      targetPort: 50051
+  selector:
+    app: auth

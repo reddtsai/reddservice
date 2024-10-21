@@ -58,5 +58,6 @@ body:
         - 小範圍修改
         - 模組範圍變更
         - 全系統影響
+        - 部署/環境變更
     validations:
       required: true
