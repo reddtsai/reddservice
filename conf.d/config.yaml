@@ -3,7 +3,7 @@ log-options:
 sql-options:
   auth:
     addr: "localhost:5432"
-    username: "admin"
+    username: "postgres"
     password: "1qaz2wsx"
     db: "auth"
     max-lifetime: 1 # 分鐘

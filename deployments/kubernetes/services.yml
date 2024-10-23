@@ -4,12 +4,13 @@ metadata:
   namespace: reddservice
   name: gateway-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
     - name: http
       protocol: TCP
       port: 80
       targetPort: 80
+      nodePort: 30080
   selector:
     app: gateway
 ---
@@ -31,3 +32,17 @@ spec:
       targetPort: 50051
   selector:
     app: auth
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: reddservice
+  name: pgpool-service
+spec:
+  selector:
+    app: pgpool
+  ports:
+    - protocol: TCP
+      port: 9999
+      targetPort: 9999

@@ -14,7 +14,7 @@
 
 ### Mermaid
 
-- Sequence Diagram：描述系統內部不同組件之間的交互；展示用戶與系統之間的交互過程。[Example](https://github.com/reddtsai/reddservice/tree/main/docs)
+- Sequence Diagram：描述系統內部不同組件之間的交互；展示用戶與系統之間的交互過程。[Example](https://github.com/reddtsai/reddservice/tree/main/docs/sequence_diagram)
 
 ## Test
 
@@ -46,10 +46,34 @@ Argo
 
 ### Docker
 
-由 docker-compose 建立整個系統，主要提供本地開發使用。
+由 Docker Compose 建立整個系統，主要提供本地開發使用。
 
 ### K8s
 
 由 K3d 建立整個系統，主要提供測試使用。
 
 > 由 k3d 建立 k8s cluster，並由 Rancher 管理 cluster，Argo 管理上版。
+
+### Architecture
+
+```mermaid
+flowchart TB
+    A1[Client1] --> gateway(Gateway)
+    A2[Client2] --> gateway(Gateway)
+    A3[Client3] --> gateway(Gateway)
+    subgraph Microservices
+        subgraph K8s
+        gateway --> auth(Auth)
+        gateway --> order(...)
+        gateway --> pay(...)
+        auth --> pgpool(pgpool)
+        end
+        pgpool === PostgreSql
+        subgraph PostgreSql
+        direction TB
+        primary(Primary) --> |replica| standby1(Standby 1)
+        primary(Primary) --> |replica| standby2(Standby 2)
+        end
+    end
+
+```
