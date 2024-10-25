@@ -54,7 +54,7 @@ const (
 func init() {
 	_authSrv = new(AuthSrv)
 	flag.IntVar(&_authSrv.grpcPort, "grpc-port", 50051, "auth server port")
-	flag.IntVar(&_authSrv.httpPort, "http-port", 8081, "metrics server port")
+	flag.IntVar(&_authSrv.httpPort, "http-port", 80, "metrics server port")
 	global.Startup(CONFIG_PATH)
 }
 

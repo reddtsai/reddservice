@@ -32,6 +32,10 @@
 
 沙盒
 
+### Load/Stress Test
+
+K6
+
 ## CI/CD
 
 ### CI
@@ -54,26 +58,58 @@ Argo
 
 > 由 k3d 建立 k8s cluster，並由 Rancher 管理 cluster，Argo 管理上版。
 
-### Architecture
+## Architecture
+
+### K8s
 
 ```mermaid
 flowchart TB
-    A1[Client1] --> gateway(Gateway)
-    A2[Client2] --> gateway(Gateway)
-    A3[Client3] --> gateway(Gateway)
-    subgraph Microservices
-        subgraph K8s
-        gateway --> auth(Auth)
-        gateway --> order(...)
-        gateway --> pay(...)
-        auth --> pgpool(pgpool)
+    classDef db fill:#336791,stroke:#333,stroke-width:2px;
+
+    C[Clients] -- HTTPS --> gatewaySvc
+
+    subgraph devCluster["K8s Developer Cluster"]
+        rancherA(Rancher Agent)
+
+        gatewayPod --> authSvc(Auth Service)
+        subgraph Gateway
+            gatewaySvc(Gateway Service) -->
+            gatewayPod["Pod
+            Gateway APP"]
         end
-        pgpool === PostgreSql
-        subgraph PostgreSql
-        direction TB
-        primary(Primary) --> |replica| standby1(Standby 1)
-        primary(Primary) --> |replica| standby2(Standby 2)
+
+        subgraph Auth
+            authSvc -->
+            authPod["Pod
+            Auth APP"]
         end
+        authPod --> pgpoolSvc
+
+        subgraph pgpool["Pgpool-II"]
+            pgpoolSvc(Pgpool Service) -->
+            pgpoolPod["Pod
+            pgpool"]:::db
+        end
+
+        gatewayPod --> orderSvc(Unimplemented)
+        gatewayPod --> paySvc(Unimplemented)
     end
 
+    subgraph manCluster["K8s Manager Cluster"]
+        rancher(Rancher) ------- rancherA
+    end
+
+    subgraph postgreSql["PostgreSql"]
+        subgraph Auth DB
+            direction TB
+            authP(Auth Primary):::db
+            authP --> |replica| authS1(Auth Standby 1):::db
+            authP --> |replica| authS2(Auth Standby 2):::db
+        end
+    end
+    pgpoolPod ==== |"
+    Read-Write Separation
+    R/W Primary
+    R Standby
+    "| postgreSql:::db
 ```
