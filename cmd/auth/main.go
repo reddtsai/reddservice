@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -30,21 +31,22 @@ import (
 
 // here value is set by ldflags
 var (
-	VERSION     = "dev"
-	CONFIG_PATH = "conf.d"
+	VERSION = "dev"
 )
 
 type AuthSrv struct {
-	wg       sync.WaitGroup
-	grpcSrv  *grpc.Server
-	grpcPort int
-	httpSrv  *http.Server
-	httpPort int
-	authDB   *sql.DB
+	wg         sync.WaitGroup
+	configPath string
+	grpcSrv    *grpc.Server
+	grpcPort   int
+	httpSrv    *http.Server
+	httpPort   int
+	authDB     *sql.DB
 }
 
 var (
 	_authSrv *AuthSrv
+	_isReady atomic.Value
 )
 
 const (
@@ -55,7 +57,8 @@ func init() {
 	_authSrv = new(AuthSrv)
 	flag.IntVar(&_authSrv.grpcPort, "grpc-port", 50051, "auth server port")
 	flag.IntVar(&_authSrv.httpPort, "http-port", 80, "metrics server port")
-	global.Startup(CONFIG_PATH)
+	flag.StringVar(&_authSrv.configPath, "config-path", "conf.d", "config path")
+	global.Startup(_authSrv.configPath)
 }
 
 func main() {
@@ -77,6 +80,7 @@ func main() {
 		grpczap.UnaryServerInterceptor(global.Logger),
 	)
 	_authSrv.metricsServer(srvMetrics)
+	_isReady.Store(false)
 	global.Logger.Debug("auth server started")
 
 	<-shutdownCh
@@ -129,6 +133,19 @@ func (srv *AuthSrv) metricsServer(promCollector prometheus.Collector) {
 	mux.Handle("/_/metrics", promhttp.HandlerFor(re, promhttp.HandlerOpts{
 		EnableOpenMetrics: true,
 	}))
+	mux.HandleFunc("/_/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+	mux.HandleFunc("/_/readyz", func(w http.ResponseWriter, r *http.Request) {
+		if _isReady.Load() == true {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("ok"))
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	})
+
 	srv.httpSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", srv.httpPort),
 		Handler: mux,

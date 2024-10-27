@@ -23,6 +23,7 @@ services:
     environment:
       - GRPC_PORT=50051
       - HTTP_PORT=8080
+      - CONFIG_PATH=conf.d
     ports:
       - "18081:8080"
     volumes:

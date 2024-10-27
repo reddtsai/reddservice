@@ -6,7 +6,7 @@ gen-grpc:
 
 .PHONY: run-auth
 run-auth:
-	@go run ./cmd/auth/ --grpc-port=50051 --http-port=8080
+	@go run ./cmd/auth/ --grpc-port=50051 --http-port=8080 --config-path=$(CONFIG_PATH)
 
 .PHONY: run-gateway
 run-gateway:
@@ -18,7 +18,7 @@ run-swag:
 
 .PHONY: build-auth
 build-auth:
-	@go build -ldflags "-X main.VERSION=0.0.1 -X main.CONFIG_PATH=$(CONFIG_PATH)" -o bin/auth ./cmd/auth/
+	@go build -ldflags "-X main.VERSION=0.0.5" -o bin/auth ./cmd/auth/
 #	go build -gcflags="-m" -o bin/auth ./cmd/auth/
 
 .PHONY: build-gateway
@@ -43,7 +43,7 @@ gen-mock:
 
 .PHONY: build-docker-image
 build-docker-image:
-	docker build --platform linux/arm64 --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
+	docker build --platform linux/arm64 --build-arg APP_VERSION=dev -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
 #	docker tag reddservice-auth:dev reddtsai/reddservice-auth:dev
 	docker push reddtsai/reddservice-auth:dev
 	docker build --platform linux/arm64 --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
