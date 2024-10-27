@@ -11,8 +11,9 @@ var (
 	loggerOnce  sync.Once
 	Logger      *zap.Logger
 	SugarLogger *zap.SugaredLogger
-	configOnce  sync.Once
-	Config      *Configuration
+
+	configOnce sync.Once
+	Config     *Configuration
 )
 
 func Startup(configPath string) {

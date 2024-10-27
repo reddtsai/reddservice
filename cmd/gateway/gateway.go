@@ -48,6 +48,10 @@ func NewGateway() *Gateway {
 func (g *Gateway) register(h *Handler) {
 	v1 := g.Handler.Group("/v1")
 	v1.POST("/sign-up", h.SignUp)
+
+	private := g.Handler.Group("/_")
+	private.GET("/healthz", h.Healthz)
+	private.GET("/readyz", h.Readyz)
 }
 
 func loggerMiddleware() gin.HandlerFunc {

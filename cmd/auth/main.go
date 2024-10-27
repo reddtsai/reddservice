@@ -64,6 +64,7 @@ func init() {
 func main() {
 	flag.Parse()
 	defer global.Logger.Sync()
+	fmt.Printf("auth version: %s\n", VERSION)
 	shutdownCh := make(chan os.Signal, 1)
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 	_, cancel := context.WithCancel(context.Background())
