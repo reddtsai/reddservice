@@ -4,13 +4,11 @@ metadata:
   namespace: reddservice
   name: gateway-service
 spec:
-  type: NodePort
   ports:
     - name: http
       protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30080
   selector:
     app: gateway
 
@@ -21,7 +19,6 @@ metadata:
   namespace: reddservice
   name: auth-service
 spec:
-  type: ClusterIP
   ports:
     - name: http
       protocol: TCP
@@ -33,6 +30,18 @@ spec:
       targetPort: 50051
   selector:
     app: auth
+
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: auth-destinationrule
+  namespace: reddservice
+spec:
+  host: auth-service.reddservice.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
 
 ---
 apiVersion: v1
@@ -47,36 +56,6 @@ spec:
     - protocol: TCP
       port: 9999
       targetPort: 9999
-
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: auth-virtualservice
-  namespace: reddservice
-spec:
-  hosts:
-    - "auth-service.reddservice.svc.cluster.local"
-  http:
-    - match:
-        - port: 50051
-      route:
-        - destination:
-            host: "auth-service.reddservice.svc.cluster.local"
-            port:
-              number: 50051
-
----
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: auth-destinationrule
-  namespace: reddservice
-spec:
-  host: auth-service.reddservice.svc.cluster.local
-  trafficPolicy:
-    loadBalancer:
-      simple: ROUND_ROBIN
 
 ---
 

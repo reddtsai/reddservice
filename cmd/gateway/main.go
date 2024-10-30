@@ -21,12 +21,12 @@ import (
 
 // here value is set by ldflags
 var (
-	VERSION     = "dev"
-	CONFIG_PATH = "conf.d"
+	VERSION = "dev"
 )
 
 type GatewaySrv struct {
 	wg             sync.WaitGroup
+	configPath     string
 	httpSrv        *http.Server
 	httpPort       int
 	grpcClientConn IGrpcClientConn
@@ -40,7 +40,8 @@ var (
 func init() {
 	_gatewaySrv = new(GatewaySrv)
 	flag.IntVar(&_gatewaySrv.httpPort, "http-port", 8081, "gateway server port")
-	global.Startup(CONFIG_PATH)
+	flag.StringVar(&_gatewaySrv.configPath, "config-path", "conf.d", "config path")
+	global.Startup(_gatewaySrv.configPath)
 }
 
 func main() {

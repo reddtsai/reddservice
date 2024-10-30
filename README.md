@@ -66,7 +66,7 @@ Argo
 flowchart TB
     classDef db fill:#336791,stroke:#333,stroke-width:2px;
 
-    C[Clients] -- HTTPS --> gatewaySvc
+    LB[Load Balancer] --> gatewaySvc
 
     subgraph devCluster["K8s Developer Cluster"]
         rancherA(Rancher Agent)

@@ -10,7 +10,7 @@ run-auth:
 
 .PHONY: run-gateway
 run-gateway:
-	@go run ./cmd/gateway/ --http-port=80
+	@go run ./cmd/gateway/ --http-port=80 --config-path=$(CONFIG_PATH)
 
 .PHONY: run-swag
 run-swag:
@@ -23,7 +23,7 @@ build-auth:
 
 .PHONY: build-gateway
 build-auth:
-	@go build -ldflags "-X main.VERSION=0.0.1 -X main.CONFIG_PATH=$(CONFIG_PATH)" -o bin/gateway ./cmd/gateway/
+	@go build -ldflags "-X main.VERSION=0.0.5" -o bin/gateway ./cmd/gateway/
 
 .PHONY: test
 test:
@@ -46,7 +46,7 @@ build-docker-image:
 	docker build --platform linux/arm64 --build-arg APP_VERSION=dev -f deployments/docker/auth/Dockerfile -t reddservice-auth:dev .
 #	docker tag reddservice-auth:dev reddtsai/reddservice-auth:dev
 	docker push reddtsai/reddservice-auth:dev
-	docker build --platform linux/arm64 --build-arg APP_VERSION=dev --build-arg CONFIG_PATH=$(CONFIG_PATH) -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
+	docker build --platform linux/arm64 --build-arg APP_VERSION=dev -f deployments/docker/gateway/Dockerfile -t reddservice-gateway:dev .
 #	docker tag reddservice-gateway:dev reddtsai/reddservice-gateway:dev
 	docker push reddtsai/reddservice-gateway:dev
 
