@@ -30,17 +30,17 @@ import (
 
 // here value is set by ldflags
 var (
-	VERSION     = "dev"
-	CONFIG_PATH = "conf.d"
+	VERSION = "dev"
 )
 
 type AuthSrv struct {
-	wg       sync.WaitGroup
-	grpcSrv  *grpc.Server
-	grpcPort int
-	httpSrv  *http.Server
-	httpPort int
-	authDB   *sql.DB
+	wg         sync.WaitGroup
+	configPath string
+	grpcSrv    *grpc.Server
+	grpcPort   int
+	httpSrv    *http.Server
+	httpPort   int
+	authDB     *sql.DB
 }
 
 var (
@@ -55,12 +55,14 @@ func init() {
 	_authSrv = new(AuthSrv)
 	flag.IntVar(&_authSrv.grpcPort, "grpc-port", 50051, "auth server port")
 	flag.IntVar(&_authSrv.httpPort, "http-port", 80, "metrics server port")
-	global.Startup(CONFIG_PATH)
+	flag.StringVar(&_authSrv.configPath, "config-path", "conf.d", "config path")
+	global.Startup(_authSrv.configPath)
 }
 
 func main() {
 	flag.Parse()
 	defer global.Logger.Sync()
+	fmt.Printf("auth version: %s\n", VERSION)
 	shutdownCh := make(chan os.Signal, 1)
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 	_, cancel := context.WithCancel(context.Background())
@@ -77,6 +79,7 @@ func main() {
 		grpczap.UnaryServerInterceptor(global.Logger),
 	)
 	_authSrv.metricsServer(srvMetrics)
+	global.IsReady.Store(false)
 	global.Logger.Debug("auth server started")
 
 	<-shutdownCh
@@ -129,6 +132,19 @@ func (srv *AuthSrv) metricsServer(promCollector prometheus.Collector) {
 	mux.Handle("/_/metrics", promhttp.HandlerFor(re, promhttp.HandlerOpts{
 		EnableOpenMetrics: true,
 	}))
+	mux.HandleFunc("/_/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+	mux.HandleFunc("/_/readyz", func(w http.ResponseWriter, r *http.Request) {
+		if global.IsReady.Load() == true {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("ok"))
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	})
+
 	srv.httpSrv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", srv.httpPort),
 		Handler: mux,

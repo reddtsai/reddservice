@@ -20,6 +20,18 @@ func NewHandler(conn IGrpcClientConn) *Handler {
 	}
 }
 
+func (h *Handler) Healthz(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
+func (h *Handler) Readyz(c *gin.Context) {
+	if global.IsReady.Load() == false {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not ready"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
 // @Summary 註冊
 // @Description 註冊用戶
 // @Tags auth

@@ -20,12 +20,12 @@ import (
 
 // here value is set by ldflags
 var (
-	VERSION     = "dev"
-	CONFIG_PATH = "conf.d"
+	VERSION = "dev"
 )
 
 type GatewaySrv struct {
 	wg             sync.WaitGroup
+	configPath     string
 	httpSrv        *http.Server
 	httpPort       int
 	grpcClientConn IGrpcClientConn
@@ -38,18 +38,21 @@ var (
 func init() {
 	_gatewaySrv = new(GatewaySrv)
 	flag.IntVar(&_gatewaySrv.httpPort, "http-port", 8081, "gateway server port")
-	global.Startup(CONFIG_PATH)
+	flag.StringVar(&_gatewaySrv.configPath, "config-path", "conf.d", "config path")
+	global.Startup(_gatewaySrv.configPath)
 }
 
 func main() {
 	flag.Parse()
 	defer global.Logger.Sync()
+	fmt.Printf("gateway version: %s\n", VERSION)
 
 	global.Logger.Debug("starting gateway server")
 	shutdownCh := make(chan os.Signal, 1)
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 	_gatewaySrv.connGrpc()
 	_gatewaySrv.httpServer()
+	global.IsReady.Store(true)
 	global.Logger.Debug("gateway server started")
 
 	<-shutdownCh

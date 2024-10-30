@@ -1,20 +1,36 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: networking.istio.io/v1
+kind: Gateway
 metadata:
-  name: gateway-ingress
+  name: reddservice-gateway
   namespace: reddservice
-  annotations:
-    nginx.ingress.k8s.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
-  rules:
-    - host: localhost
-      http:
-        paths:
-          - path: /gateway
-            pathType: Prefix
-            backend:
-              service:
-                name: gateway-service
-                port:
-                  number: 80
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: reddservice-gateway-virtualservice
+  namespace: reddservice
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - reddservice-gateway
+  http:
+    - match:
+        - uri:
+            exact: /v1/sign-up
+      route:
+        - destination:
+            host: gateway-service
+            port:
+              number: 80
