@@ -25,7 +25,7 @@ func (h *Handler) Healthz(c *gin.Context) {
 }
 
 func (h *Handler) Readyz(c *gin.Context) {
-	if _isReady.Load() == false {
+	if global.IsReady.Load() == false {
 		c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not ready"})
 		return
 	}

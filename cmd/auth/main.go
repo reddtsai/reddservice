@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -46,7 +45,6 @@ type AuthSrv struct {
 
 var (
 	_authSrv *AuthSrv
-	_isReady atomic.Value
 )
 
 const (
@@ -81,7 +79,7 @@ func main() {
 		grpczap.UnaryServerInterceptor(global.Logger),
 	)
 	_authSrv.metricsServer(srvMetrics)
-	_isReady.Store(false)
+	global.IsReady.Store(false)
 	global.Logger.Debug("auth server started")
 
 	<-shutdownCh
@@ -139,7 +137,7 @@ func (srv *AuthSrv) metricsServer(promCollector prometheus.Collector) {
 		w.Write([]byte("ok"))
 	})
 	mux.HandleFunc("/_/readyz", func(w http.ResponseWriter, r *http.Request) {
-		if _isReady.Load() == true {
+		if global.IsReady.Load() == true {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("ok"))
 		} else {

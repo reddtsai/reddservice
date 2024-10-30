@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -34,7 +33,6 @@ type GatewaySrv struct {
 
 var (
 	_gatewaySrv *GatewaySrv
-	_isReady    atomic.Value
 )
 
 func init() {
@@ -54,7 +52,7 @@ func main() {
 	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
 	_gatewaySrv.connGrpc()
 	_gatewaySrv.httpServer()
-	_isReady.Store(true)
+	global.IsReady.Store(true)
 	global.Logger.Debug("gateway server started")
 
 	<-shutdownCh

@@ -2,6 +2,7 @@ package global
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -14,6 +15,8 @@ var (
 
 	configOnce sync.Once
 	Config     *Configuration
+
+	IsReady atomic.Value
 )
 
 func Startup(configPath string) {
