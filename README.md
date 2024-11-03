@@ -42,22 +42,6 @@ K6
 
 Containerization，透過 github workflow 產生 APP docker container image
 
-### CD
-
-Argo
-
-## Environment
-
-### Docker
-
-由 Docker Compose 建立整個系統，主要提供本地開發使用。
-
-### K8s
-
-由 K3d 建立整個系統，主要提供測試使用。
-
-> 由 k3d 建立 k8s cluster，並由 Rancher 管理 cluster，Argo 管理上版。
-
 ## Architecture
 
 ### K8s
@@ -66,50 +50,69 @@ Argo
 flowchart TB
     classDef db fill:#336791,stroke:#333,stroke-width:2px;
 
-    LB[Load Balancer] --> gatewaySvc
+    lb[Load Balancer]
+    ad[Admin]
+
+    subgraph manCluster["K8s Manager Cluster"]
+        rancher[Rancher]
+        grafana[Grafana]
+        loki[Loki]
+        prometheus[Prometheus]
+    end
 
     subgraph devCluster["K8s Developer Cluster"]
-        rancherA(Rancher Agent)
+        fluentB[Fluent Bit]
+        rancherA[Rancher Agent]
+        orderSvc[Unimplemented]
+        paySvc[Unimplemented]
 
-        gatewayPod --> authSvc(Auth Service)
         subgraph Gateway
-            gatewaySvc(Gateway Service) -->
+            gatewaySvc["Ingress
+            Gateway Service"] -->
             gatewayPod["Pod
-            Gateway APP"]
+            Gateway APP
+            Istio"]
         end
 
         subgraph Auth
-            authSvc -->
+            authSvc[Auth Service] -->
             authPod["Pod
-            Auth APP"]
+            Auth APP
+            Istio"]
         end
-        authPod --> pgpoolSvc
 
         subgraph pgpool["Pgpool-II"]
-            pgpoolSvc(Pgpool Service) -->
+            pgpoolSvc[Pgpool Service] -->
             pgpoolPod["Pod
             pgpool"]:::db
         end
-
-        gatewayPod --> orderSvc(Unimplemented)
-        gatewayPod --> paySvc(Unimplemented)
-    end
-
-    subgraph manCluster["K8s Manager Cluster"]
-        rancher(Rancher) ------- rancherA
     end
 
     subgraph postgreSql["PostgreSql"]
         subgraph Auth DB
-            direction TB
             authP(Auth Primary):::db
             authP --> |replica| authS1(Auth Standby 1):::db
             authP --> |replica| authS2(Auth Standby 2):::db
         end
     end
-    pgpoolPod ==== |"
-    Read-Write Separation
-    R/W Primary
-    R Standby
-    "| postgreSql:::db
+
+ad --> rancher
+ad --> grafana
+lb --> gatewaySvc
+
+grafana --> prometheus --> devCluster
+grafana --> loki --> minio(Minio)
+
+rancherA ----> rancher
+fluentB ---> loki
+
+gatewayPod --> authSvc
+gatewayPod --> orderSvc
+gatewayPod --> paySvc
+authPod --> pgpoolSvc
+
+
+pgpoolPod ==== |"Read-Write Separation
+R/W Primary
+R Standby"| postgreSql:::db
 ```

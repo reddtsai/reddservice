@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: reddtsai/reddservice-gateway:v0.0.5
+          image: reddtsai/reddservice-gateway:v0.0.6
           ports:
             - containerPort: 80
           env:
@@ -29,6 +29,20 @@ spec:
             - name: config-volume
               mountPath: /app/conf.d/config.yaml
               subPath: config.yml
+          livenessProbe:
+            httpGet:
+              path: /_/healthz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /_/readyz
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: config-volume
           configMap:
@@ -54,7 +68,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: reddtsai/reddservice-auth:v0.0.5
+          image: reddtsai/reddservice-auth:v0.0.6
           ports:
             - containerPort: 80
             - containerPort: 50051
