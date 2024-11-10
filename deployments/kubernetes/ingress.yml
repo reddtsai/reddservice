@@ -34,3 +34,40 @@ spec:
             host: gateway-service
             port:
               number: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: reddservice-ingress
+  annotations:
+    kubernetes.io/ingress.ingressClassName: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: default-redirect-to-https@kubernetescrd
+    cert-manager.io/issuer: reddtsai-org-issuer
+spec:
+  tls:
+    - hosts:
+        - "gateway.reddtsai.org"
+      secretName: reddservice-ingress-secret
+  rules:
+    - host: gateway.reddtsai.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-service
+                port:
+                  number: 80
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-to-https
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
