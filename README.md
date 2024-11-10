@@ -127,7 +127,7 @@ kubectl apply -f deployments/kubernetes
 
 單元測試過程中，使用模擬(Mock)方式與單元外相依物件互動。
 
-> 由 `go generate` 產生 mock file。generate 還不支持 generic，請必免使用。
+> 由 `go generate` 產生 mock file。generate 還不支持 generic，請避免使用。
 
 ## CI/CD
 
